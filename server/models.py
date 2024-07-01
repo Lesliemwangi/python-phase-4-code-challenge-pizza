@@ -1,3 +1,4 @@
+# models.py
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, ForeignKey
 from sqlalchemy.orm import relationship, validates
@@ -28,7 +29,7 @@ class Restaurant(db.Model, SerializerMixin):
     serialize_rules = ('-restaurant_pizzas.restaurant',)
 
     def __repr__(self):
-        return f"<Restaurant {self.name}>"
+        return f"Restaurant(id={self.id}, name={self.name}, address={self.address})"
 
 
 class Pizza(db.Model, SerializerMixin):
@@ -46,7 +47,7 @@ class Pizza(db.Model, SerializerMixin):
     serialize_rules = ('-restaurant_pizzas.pizza',)
 
     def __repr__(self):
-        return f"<Pizza {self.name}, {self.ingredients}>"
+        return f"Pizza(id={self.id}, name={self.name}, ingredients={self.ingredients})"
 
 
 class RestaurantPizza(db.Model, SerializerMixin):
@@ -70,4 +71,4 @@ class RestaurantPizza(db.Model, SerializerMixin):
         return price
 
     def __repr__(self):
-        return f"<RestaurantPizza ${self.price}>"
+       return f"RestaurantPizza(id={self.id}, price={self.price}, pizza_id={self.pizza_id}, restaurant_id={self.restaurant_id})"
