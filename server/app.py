@@ -1,4 +1,4 @@
-#app.py
+# app.py
 #!/usr/bin/env python3
 from models import db, Restaurant, RestaurantPizza, Pizza
 from flask_migrate import Migrate
@@ -9,10 +9,10 @@ import os
 app = Flask(__name__)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# Set up database connection
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASE = os.environ.get(
     "DB_URI", f"sqlite:///{os.path.join(BASE_DIR, 'app.db')}")
-
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE
 
 migrate = Migrate(app, db)
@@ -20,24 +20,21 @@ migrate = Migrate(app, db)
 db.init_app(app)
 api = Api(app)
 
-
+# Root endpoint
 @app.route("/")
 def index():
     return "<h1>Code challenge</h1>"
 
-
+# Get all restaurants
 class RestaurantClass(Resource):
     def get(self):
-        restaurant_list = [
-            restaurant.to_dict(rules=("-restaurant_pizzas",))
-            for restaurant in Restaurant.query.all()
-        ]
+        restaurant_list = [restaurant.to_dict(
+            rules=("-restaurant_pizzas",)) for restaurant in Restaurant.query.all()]
         return make_response(restaurant_list, 200)
-
 
 api.add_resource(RestaurantClass, "/restaurants")
 
-
+# Get, delete restaurant by ID
 class RestaurantById(Resource):
     def get(self, id):
         restaurant = Restaurant.query.filter_by(id=id).one_or_none()
@@ -58,7 +55,7 @@ class RestaurantById(Resource):
 
 api.add_resource(RestaurantById, "/restaurants/<int:id>")
 
-
+# Get all pizzas
 class PizzaClass(Resource):
     def get(self):
         pizzas = [pizza.to_dict(only=("id", "ingredients", "name"))
@@ -68,7 +65,7 @@ class PizzaClass(Resource):
 
 api.add_resource(PizzaClass, "/pizzas")
 
-
+# Create restaurant-pizza association
 class RestaurantPizzasClass(Resource):
     def post(self):
         try:
@@ -80,7 +77,6 @@ class RestaurantPizzasClass(Resource):
             )
             db.session.add(new_res_pizza)
             db.session.commit()
-
             return make_response(new_res_pizza.to_dict(), 201)
         except (KeyError, ValueError):
             return make_response({"errors": ["validation errors"]}, 400)
